@@ -6,9 +6,14 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Use CORS to allow requests from your frontend's domain
-app.use(cors()); 
+// Allow requests from anywhere (you can restrict later to your React domain)
+app.use(cors());
 app.use(express.json());
+
+// Root route for testing
+app.get("/", (req, res) => {
+  res.send("🚀 Job backend is running on Railway");
+});
 
 app.get('/api/jobs', async (req, res) => {
     const { query } = req.query;
@@ -23,7 +28,7 @@ app.get('/api/jobs', async (req, res) => {
         method: 'GET',
         headers: {
             'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-            'x-rapidapi-key': process.env.RAPIDAPI_KEY, // Securely loaded from Render's environment variables
+            'x-rapidapi-key': process.env.RAPIDAPI_KEY, // Must be set in Railway Variables
         },
     };
 
@@ -32,7 +37,7 @@ app.get('/api/jobs', async (req, res) => {
         const apiResponse = await fetch(url, options);
         const data = await apiResponse.json();
 
-        if (data.status === 'OK') {
+        if (data.data) {
             res.json(data.data);
         } else {
             console.error('Error from JSearch API:', data);
@@ -45,5 +50,5 @@ app.get('/api/jobs', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`✅ Server is running on http://localhost:${PORT}`);
+    console.log(`✅ Server is running on port ${PORT}`);
 });
